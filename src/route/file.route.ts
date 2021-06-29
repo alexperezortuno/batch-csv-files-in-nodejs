@@ -1,7 +1,7 @@
 import {Router, Request, Response} from 'express';
 import Responses from '../classes/responses';
-import {uploadOneCsv} from '../lib/image';
-import Logger from '../lib/logger';
+import {uploadOneCsv} from '../libs/image';
+import Logger from '../libs/logger';
 
 const fileRouter: Router = Router();
 const responses: Responses = Responses.instance;

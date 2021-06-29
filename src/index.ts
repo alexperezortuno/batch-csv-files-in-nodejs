@@ -1,7 +1,7 @@
 import Server from './classes/server';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import Logger from './lib/logger';
+import Logger from './libs/logger';
 import healthRouter from './route/health.route';
 import fileRouter from './route/file.route';
 

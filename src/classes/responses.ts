@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {HttpSuccess, HttpError} from '../global/http_codes';
 import {ResponseInterface} from '../interface/response.interface';
-import Logger from '../lib/logger';
+import Logger from '../libs/logger';
 
 export default class Responses {
     private static _instance: Responses;
