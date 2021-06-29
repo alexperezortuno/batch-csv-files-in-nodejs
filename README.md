@@ -1,3 +1,4 @@
+[![N|Solid](src/assets/brand/logo.png)](https://www.alexperezortuno.pro/images/logo.svg)
 # batch-csv-files-in-nodejs
 
 Process csv files with nodejs and PLS
