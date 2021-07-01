@@ -46,6 +46,7 @@ fileRouter.post('/upload', (req: Request, res: Response) => {
                             )
                             .then((csvSplitResponse: any) => {
                                 Logger.debug(`csvSplitStream succeeded ${csvSplitResponse.toString()}`);
+                                utils.removeFile(path.resolve(__dirname, <string>req.file?.destination, <string>req.file?.filename));
                                 responses.ok(req, res);
                             })
                             .catch((csvSplitError: any) => {

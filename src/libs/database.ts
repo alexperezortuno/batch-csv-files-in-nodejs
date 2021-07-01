@@ -1,10 +1,9 @@
 import pgk from 'pg'
-// import { PoolClient, Pool, QueryResult } from 'pg';
 import {DB} from '../global/environment';
 import Logger from './logger';
 
 const pgconfig = {
-    connectionString: 'postgres://postgres:postgres@db-generic-postgres:5432/testdb',
+    connectionString: DB.connStr,
     max: DB.max,
     connectionTimeoutMillis: DB.connectionTimeoutMillis,
     idleTimeoutMillis: DB.idleTimeoutMillis,
@@ -18,10 +17,6 @@ pool.on('error', function (err: Error) {
 
 Logger.info(`DB Connection Settings: ${JSON.stringify(pgconfig)}`);
 
-pool.on('error', function (err: Error) {
-    Logger.error(`idle client error, ${err.message} | ${err.stack}`);
-});
-
 /* 
  * Single Query to Postgres
  * @param sql: the query for store data
@@ -29,7 +24,6 @@ pool.on('error', function (err: Error) {
  * @return result
  */
 export const sqlToDB = async (sql: string, data: string[][]) => {
-    Logger.debug(`sqlToDB() sql: ${sql} | data: ${data}`);
     let result: pgk.QueryResult;
     try {
         result = await pool.query(sql, data);
@@ -44,8 +38,8 @@ export const sqlToDB = async (sql: string, data: string[][]) => {
  * COMMMIT or ROALLBACK needs to be called at the end before releasing the connection back to pool.
  */
 export const getTransaction = async () => {
-    Logger.debug(`getTransaction()`);
     const client: pgk.PoolClient = await pool.connect();
+
     try {
         await client.query('BEGIN');
         return client;
@@ -61,11 +55,10 @@ export const getTransaction = async () => {
  * @return result
  */
 export const sqlExecSingleRow = async (client: pgk.PoolClient, sql: string, data: string[][]) => {
-    Logger.debug(`sqlExecSingleRow() sql: ${sql} | data: ${data}`);
     let result: pgk.QueryResult;
+
     try {
         result = await client.query(sql, data);
-        Logger.debug(`sqlExecSingleRow(): ${result.command} | ${result.rowCount}`);
         return result
     } catch (error) {
         Logger.error(`sqlExecSingleRow() error: ${error.message} | sql: ${sql} | data: ${data}`);
@@ -80,13 +73,9 @@ export const sqlExecSingleRow = async (client: pgk.PoolClient, sql: string, data
  * @return result
  */
 export const sqlExecMultipleRows = async (client: pgk.PoolClient, sql: string, data: string[][]) => {
-    Logger.debug(`inside sqlExecMultipleRows()`);
-    Logger.debug(`sqlExecMultipleRows() data: ${data}`);
     if (data.length !== 0) {
         for (let item of data) {
             try {
-                Logger.debug(`sqlExecMultipleRows() item: ${item}`);
-                Logger.debug(`sqlExecMultipleRows() sql: ${sql}`);
                 await client.query(sql, item);
             } catch (error) {
                 Logger.error(`sqlExecMultipleRows() error: ${error}`);
@@ -121,7 +110,6 @@ export const rollback = async (client: pgk.PoolClient) => {
  * Commit transaction
  */
 export const commit = async (client: pgk.PoolClient) => {
-    Logger.debug(`sql transaction committed`);
     try {
         await client.query('COMMIT');
     } catch (error) {

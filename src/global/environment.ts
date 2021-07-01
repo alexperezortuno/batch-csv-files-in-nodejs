@@ -15,7 +15,7 @@ export const DB: DatabaseInterface = {
     database: process.env.DB_DATABASE || 'testdb',
     password: process.env.DB_PASSWORD || 'postgres',
     port: Number(process.env.DB_PORT) || 5432,
-    connStr: process.env.CONN_STR || undefined,
+    connStr: process.env.DB_CONN_STR || undefined,
     max: Number(process.env.DB_MAX_CLIENT) || 10,
     idleTimeoutMillis: Number(process.env.DB_TIME_OUT) || 30000,
     connectionTimeoutMillis: Number(process.env.DB_CONNECTIONS_TIME_OUT) || 2000,

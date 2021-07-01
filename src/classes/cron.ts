@@ -3,6 +3,7 @@ import Logger from '../libs/logger';
 import * as path from 'path';
 import Utils from './utils';
 import {parseFile} from 'fast-csv';
+import * as insurance from './../models/insuranse.model';
 
 const __dirname: string = path.resolve();
 const utils: Utils = Utils.instance;
@@ -28,16 +29,26 @@ export default class Cron {
 
                         for (const r of res) {
                             promises.push(this.processCsv(r));
-                            // this.processCsv(r).then(() => {});
                         }
 
                         return Promise.all(promises);
-                        // sch.start();
                     }
-                    console.timeEnd('csvScheduler');
                 })
                 .then(r => {
-                    Logger.debug('complete ' + r);
+                    if (r !== undefined) {
+                        for (const v of r) {
+                            if (v.status) {
+                                utils.removeFile(v.path);
+                                Logger.debug('✔ complete ' + v.path);
+                            } else {
+                                Logger.debug('✖ not complete ' + v.path)
+                            }
+                        }
+                    }
+                })
+                .finally(() => {
+                    console.timeEnd('csvScheduler');
+                    sch.start();
                 });
         });
     }
@@ -59,29 +70,24 @@ export default class Cron {
                         }
                     }
                 })
-                .catch(err => {
-                    Logger.error('recursiveDirectory', err.toString());
-                    reject(files);
-                })
                 .finally(() => {
                     resolve(files);
                 });
         });
     }
 
-    processCsv = (param: string): Promise<boolean> => {
+    processCsv = (param: string): Promise<{ path: any, status: boolean }> => {
         return new Promise(async resolve => {
+            const bulk_data: any[][] = [];
             parseFile(param, {headers: true})
                 .on('error', error => Logger.error(error.message))
-                .on('data', row => {
-                    // db.insert('insurance',
-                    //     'statecode, policyID',
-                    //     [row.statecode, row.policyID]);
-                    Logger.debug('row', row.toString());
+                .on('data', async row => {
+                    bulk_data.push([row.statecode, row.policyID]);
                 })
-                .on('end', (rowCount: number) => {
-                    console.log(`Parsed ${rowCount} rows`);
-                    resolve(true);
+                .on('end', async (rowCount: number) => {
+                    Logger.debug(`Parsed ${rowCount} rows`);
+                    await insurance.batch(bulk_data);
+                    resolve({path: param, status: true});
                 });
         });
     }

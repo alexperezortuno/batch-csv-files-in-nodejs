@@ -51,4 +51,12 @@ export default class Utils {
             return false;
         }
     }
+
+    removeFile = (param: string): void => {
+        try {
+            fs.unlinkSync(param);
+        } catch (e) {
+            Logger.error(e.toString());
+        }
+    }
 }

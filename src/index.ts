@@ -21,7 +21,7 @@ server.app.use(bodyParser.json());
 server.app.use(cors({origin: true, credentials: true}));
 
 // Scheduler Tasks
-// schedulerTasks.csvScheduler(server.csvScheduler).then(() => {});
+schedulerTasks.csvScheduler(server.csvScheduler).then(() => {});
 
 // Routes
 server.app.use(context, healthRouter);
@@ -29,5 +29,5 @@ server.app.use(context, insuranceRouter);
 server.app.use([context, 'file'].join('/'), fileRouter);
 
 server.init(() => {
-    Logger.info(`⚡️ Server is running in port: ${server.port}`);
+    Logger.info(`⚡ Server is running in port: ${server.port}`);
 });
