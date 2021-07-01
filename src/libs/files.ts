@@ -7,6 +7,16 @@ const csvFilter = (req: any, file: any, cb: any) => {
     cb(null, true);
 };
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, process.env.CSV_DESTINATION || 'uploads')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${file.originalname.toLowerCase()}`;
+        cb(null, `${file.fieldname}-${uniqueSuffix}`)
+    }
+})
+
 const csvLimits = {
     /** Maximum size of each form field name in bytes. (Default: 100) */
     fieldNameSize: Number(process.env.CSV_FIELD_NAME_SIZE) || 100,
@@ -26,11 +36,11 @@ const csvLimits = {
 
 export const uploadArrCsv = multer({
     fileFilter: csvFilter,
-    dest: process.env.CSV_DESTINATION || 'uploads',
     limits: csvLimits,
 }).array('file');
 
 export const uploadOneCsv = multer({
+    storage,
     fileFilter: csvFilter,
     dest: process.env.CSV_DESTINATION || 'uploads',
     limits: csvLimits,
