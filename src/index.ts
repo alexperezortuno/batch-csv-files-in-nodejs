@@ -2,6 +2,7 @@ import Server from './classes/server';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { cpus } from 'os';
+import * as  cluster from 'cluster';
 import Logger from './libs/logger';
 import healthRouter from './route/health.route';
 import fileRouter from './route/file.route';
@@ -29,5 +30,5 @@ server.app.use(context, insuranceRouter);
 server.app.use([context, 'file'].join('/'), fileRouter);
 
 server.init(() => {
-    Logger.info(`⚡ Server is running in port: ${server.port}`);
+    Logger.info(`⚡ worker started: ${cluster.worker} | Server is running in port: ${server.port}`);
 });

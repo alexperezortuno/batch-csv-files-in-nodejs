@@ -18,7 +18,7 @@ export default class Cron {
     csvScheduler = async (param: string): Promise<void> => {
         const sch = cron.schedule(param, async () => {
             console.time('csvScheduler');
-            Logger.debug('csv scheduler task running');
+            Logger.info('⚙ csv scheduler task running');
             Logger.debug(__dirname);
             const dirname: string = `${__dirname}/outputs`;
             this.recursiveDirectory(dirname)
@@ -48,6 +48,7 @@ export default class Cron {
                 })
                 .finally(() => {
                     console.timeEnd('csvScheduler');
+                    Logger.info('⚙ csv scheduler task end');
                     sch.start();
                 });
         });
